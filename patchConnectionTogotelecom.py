@@ -29,27 +29,28 @@ def is_connected():
 
 
 def hardRestartNetwork():
-  system('nmcli nm enable false')
-  system('nmcli nm enable true')
-  sleep(5)
-  system("nmcli con up id '%s'"% connectionName)
+  system('nmcli networking off')
+  system('nmcli networking on')
+  #sleep(5)
+  #system("nmcli connection up '%s'"% connectionName)
 
 
 def patchTogotelecom():
-  activeReseau = system('nmcli nm enable true')
-  deconnectionSoft = system('nmcli dev disconnect iface ttyUSB0')
+  activeReseau = system('nmcli networking on')
+  deconnectionSoft = system("nmcli connection down '%s'"% connectionName)
   
-  sleep(5)
+  sleep(3)
+  connectionSoft = system("nmcli connection up '%s'"% connectionName)
 
-  if (deconnectionSoft == 0 or deconnectionSoft == 1536):
-    activeTGTEL = system("nmcli con up id '%s'"% connectionName)
-    if activeTGTEL == 768:
-      # si Erreur : le délai d'attente de 90 sec a expiré.
-      #system('modprobe --force-vermagic usb_wwan usbserial')
-      hardRestartNetwork()      
-  else:
-    # redemarrer le reseau si la methode soft ne marche pas
-    hardRestartNetwork()
+  # if (deconnectionSoft == 0 or deconnectionSoft == 1536):
+  #   activeTGTEL = system("nmcli connection up '%s'"% connectionName)
+  #   if activeTGTEL == 768:
+  #     # si Erreur : le délai d'attente de 90 sec a expiré.
+  #     #system('modprobe --force-vermagic usb_wwan usbserial')
+  #     hardRestartNetwork()      
+  # else:
+  #   # redemarrer le reseau si la methode soft ne marche pas
+  #   hardRestartNetwork()
     
   if is_connected():
     print(u'Connecté le %s '%str(datetime.now().strftime('%d-%m-%Y -> %H:%M:%S')))
@@ -61,14 +62,14 @@ def patchTogotelecom():
 
 # debut de l execution du script
 #system('modprobe --force-vermagic usb_wwan usbserial')
-hardRestartNetwork()
+#hardRestartNetwork()
 print(u'debut du script > %s '%str(datetime.now().strftime('%d-%m-%Y -> %H:%M:%S')))
 sleep(5)
 
 
 while True:
     if is_connected():
-      sleep(60)
+      sleep(15)
     else:
       print(u'Tentative de reconnexion le %s '%str(datetime.now().strftime('%d-%m-%Y -> %H:%M:%S')))
       patchTogotelecom()
